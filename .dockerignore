@@ -1,0 +1,12 @@
+.venv/
+.git/
+.gitignore
+.python-version
+__pycache__/
+*.pyc
+*.pyo
+db.sqlite3
+staticfiles/
+handoff-test-django-tasks-libs.md
+GRILL-ME.md
+.pi/

@@ -1,0 +1,99 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: tasks
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d tasks"]
+      interval: 5s
+      timeout: 5s
+      retries: 15
+
+  web:
+    build: .
+    image: test-django-tasks-libs
+    command: python manage.py runserver 0.0.0.0:8000
+    ports:
+      - "8080:8000"
+    environment: &app-env
+      POSTGRES_DB: tasks
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_HOST: db
+      POSTGRES_PORT: "5432"
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/tasks
+      DJANGO_DEBUG: "1"
+      DJANGO_ALLOWED_HOSTS: "*"
+      DJANGO_SUPERUSER_USERNAME: admin
+      DJANGO_SUPERUSER_EMAIL: admin@example.com
+      DJANGO_SUPERUSER_PASSWORD: admin
+    depends_on:
+      db:
+        condition: service_healthy
+
+  worker_huey:
+    image: test-django-tasks-libs
+    command: python manage.py run_huey
+    environment: *app-env
+    depends_on:
+      db:
+        condition: service_healthy
+
+  worker_dramatiq:
+    image: test-django-tasks-libs
+    command: python manage.py rundramatiq -p 1 -t 2
+    environment: *app-env
+    depends_on:
+      db:
+        condition: service_healthy
+
+  worker_q2:
+    image: test-django-tasks-libs
+    command: python manage.py qcluster
+    environment: *app-env
+    depends_on:
+      db:
+        condition: service_healthy
+
+  worker_tasks_db:
+    image: test-django-tasks-libs
+    command: python manage.py db_worker --no-reload
+    environment: *app-env
+    depends_on:
+      db:
+        condition: service_healthy
+
+  worker_chancy:
+    image: test-django-tasks-libs
+    command: chancy --app chancy_instance.chancy worker start
+    environment:
+      <<: *app-env
+      PYTHONPATH: /app
+    depends_on:
+      db:
+        condition: service_healthy
+
+  worker_procrastinate:
+    image: test-django-tasks-libs
+    command: python manage.py procrastinate worker
+    environment: *app-env
+    depends_on:
+      db:
+        condition: service_healthy
+
+  worker_taskito:
+    image: test-django-tasks-libs
+    command: python manage.py taskito_worker
+    environment: *app-env
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:

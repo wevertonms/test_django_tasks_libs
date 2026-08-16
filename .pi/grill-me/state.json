@@ -1,0 +1,92 @@
+{
+  "createdAt": "2026-08-16T14:16:36.014Z",
+  "updatedAt": "2026-08-16T14:25:24.706Z",
+  "projectDir": "/home/weverton/Documentos/github/test_django_tasks_libs",
+  "plan": "(state was created by grill_record_turn; no plan recorded)",
+  "turns": [
+    {
+      "question": "Gerenciador de dependências / ambiente virtual",
+      "recommendedAnswer": "uv",
+      "userAnswer": "uv",
+      "decisionStatus": "resolved"
+    },
+    {
+      "decisionStatus": "resolved",
+      "question": "Versão do Django",
+      "recommendedAnswer": "Django 5.2 LTS",
+      "userAnswer": "5.2"
+    },
+    {
+      "decisionStatus": "resolved",
+      "question": "Infraestrutura do PostgreSQL",
+      "recommendedAnswer": "Docker Compose",
+      "userAnswer": "docker compose"
+    },
+    {
+      "decisionStatus": "resolved",
+      "question": "Estrutura do projeto Django",
+      "recommendedAnswer": "Um app por lib, com app core/ compartilhado",
+      "userAnswer": "um app por lib"
+    },
+    {
+      "decisionStatus": "resolved",
+      "question": "Tasks de demonstração",
+      "recommendedAnswer": "A mesma task em todas as libs — simula algo real com sleep + salva resultado no banco",
+      "userAnswer": "A mesma task em todas as libs"
+    },
+    {
+      "decisionStatus": "resolved",
+      "question": "O que a task de demonstração faz?",
+      "recommendedAnswer": "generate_report(n) — dorme n segundos, grava Report model no banco com status, duração e timestamp",
+      "userAnswer": "Siga com a recomendação"
+    },
+    {
+      "decisionStatus": "resolved",
+      "question": "Integração com Django Admin",
+      "recommendedAnswer": "Models nativos registrados + admin action no Report model para disparar generate_report",
+      "userAnswer": "Siga com a recomendação"
+    },
+    {
+      "decisionStatus": "resolved",
+      "question": "Settings: um arquivo ou múltiplos?",
+      "recommendedAnswer": "Um único settings.py com todas as libs configuradas juntas",
+      "userAnswer": "Siga com a recomendação"
+    },
+    {
+      "decisionStatus": "resolved",
+      "question": "Workers no Docker Compose",
+      "recommendedAnswer": "Um serviço por worker: worker_huey, worker_dramatiq, worker_q2, worker_tasks_db + web + db",
+      "userAnswer": "Siga com a recomendação"
+    },
+    {
+      "decisionStatus": "resolved",
+      "question": "django-dramatiq usa broker intermediário — como resolver?",
+      "recommendedAnswer": "Usar django-dramatiq + dramatiq-pg como broker PostgreSQL, sem Redis",
+      "userAnswer": "Confirmo dramatiq-pg"
+    },
+    {
+      "decisionStatus": "resolved",
+      "question": "Como disparar as tasks para teste?",
+      "recommendedAnswer": "Admin action no Report model + management command run_task &lt;lib&gt; &lt;n&gt;",
+      "userAnswer": "Siga com a recomendação"
+    },
+    {
+      "decisionStatus": "resolved",
+      "question": "Superusuário do Admin",
+      "recommendedAnswer": "Variável de ambiente no Docker Compose, criado via createsuperuser --no-input no entrypoint",
+      "userAnswer": "Siga com a recomendação"
+    },
+    {
+      "decisionStatus": "resolved",
+      "question": "Model Report: compartilhado ou por lib?",
+      "recommendedAnswer": "App core/ compartilhado com único Report model, campos: source, status, duration_seconds, started_at, finished_at",
+      "userAnswer": "Siga com a recomendação"
+    },
+    {
+      "decisionStatus": "resolved",
+      "question": "Versão do Python no Docker",
+      "recommendedAnswer": "Python 3.12",
+      "userAnswer": "3.12"
+    }
+  ]
+}
