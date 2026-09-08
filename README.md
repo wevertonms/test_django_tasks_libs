@@ -6,13 +6,13 @@ workers isolados via Docker Compose.
 
 | Biblioteca | Broker | Worker |
 | --- | --- | --- |
-| `huey` 3.3.4 (`huey.contrib.djhuey`) | Postgres (`huey.PostgresHuey`) | `manage.py run_huey` |
+| `huey` 3.4.0 (`huey.contrib.djhuey`) | Postgres (`huey.PostgresHuey`) | `manage.py run_huey` |
 | `django-dramatiq` 0.15.0 | Postgres (`dramatiq-pg`) | `manage.py rundramatiq` |
-| `django-q2` 1.11.0 | Postgres (ORM broker) | `manage.py qcluster` |
-| `django-tasks-db` 0.12.0 | Postgres (`django_tasks_db`) | `manage.py db_worker` |
+| `django-q2` 1.11.1 | Postgres (ORM broker) | `manage.py qcluster` |
+| `django-tasks-db` 0.13.0 | Postgres (`django_tasks_db`) | `manage.py db_worker` |
 | `chancy` 0.25.1 | Postgres (psycopg3) | `chancy worker start` |
 | `procrastinate` 3.9.0 | Postgres (psycopg) | `manage.py procrastinate worker` |
-| `flexiq` 1.0.0 (Rust core, ex-taskito) | Postgres (`flexiq[postgres]`) | `manage.py flexiq_worker` |
+| `flexiq` 2.0.0 (Rust core, ex-taskito) | Postgres (`flexiq[postgres]`) | `manage.py flexiq_worker` |
 
 - Django 5.2 LTS · Python 3.12 · `uv` como gerenciador de pacotes.
 - **Sem Redis**: as 7 filas vivem no mesmo PostgreSQL.
@@ -84,7 +84,7 @@ Tudo está em `config/settings.py`:
 - **django-dramatiq**: `DRAMATIQ_BROKER` apontando para `dramatiq_pg.PostgresBroker` com `url`. O schema do broker é criado no `entrypoint.sh` via `generate_init_sql`.
 - **django-q2**: `Q_CLUSTER` com `orm: "default"` (broker Postgres via ORM).
 - **django-tasks-db**: `TASKS = {"default": {"BACKEND": "django_tasks_db.DatabaseBackend"}}` (backend oficial do framework `django-tasks`).
-- **chancy**: `chancy.contrib.django` (tabelas criadas via `chancy misc migrate`). Usa `config.chancy_app.chancy` para enqueue síncrono.
+- **chancy**: `chancy.contrib.django` (tabelas criadas via `chancy misc migrate`). Usa `chancy_instance.chancy` para enqueue síncrono.
 - **procrastinate**: `procrastinate.contrib.django` com `PROCRASTINATE_DATABASE_ALIAS = "default"`. Worker via `manage.py procrastinate worker`.
 - **flexiq** (ex-taskito, renomeado na 1.0.0): `flexiq.contrib.django` (integração oficial). Backend Postgres via `FLEXIQ_BACKEND`, `FLEXIQ_DB_URL` e `FLEXIQ_SCHEMA` nas Django settings. Worker via `manage.py flexiq_worker` (o CLI standalone `flexiq worker --app` não chama `django.setup()`). Tabelas criadas automaticamente no schema `flexiq` na primeira conexão. Tasks rodam em contexto async — o body usa `@sync_to_async` para chamar o ORM.
 
@@ -113,7 +113,7 @@ uv run python manage.py run_huey         # worker huey (um terminal por worker)
 uv run python manage.py rundramatiq -p 1 -t 2
 uv run python manage.py qcluster
 uv run python manage.py db_worker --no-reload
-uv run chancy --app config.chancy_app worker start
+uv run chancy --app chancy_instance.chancy worker start
 uv run python manage.py procrastinate worker
 uv run python manage.py flexiq_worker
 uv run python manage.py run_task huey 2
@@ -122,6 +122,7 @@ uv run python manage.py run_task huey 2
 ## Notas e pegadinhas conhecidas
 
 - **dramatiq-pg 0.12.0** declara `psycopg2` como dependência implícita — o projeto adiciona `psycopg2-binary` explicitamente.
+- **django-tasks-db 0.13.0** deixou de declarar `django-tasks` como dependência (num Django 5.2 sem `django.tasks` embutido). O projeto adiciona `django-tasks` explicitamente; sem ele o import quebra em `django_tasks_db.compat` com `ValueError`.
 - O CLI `dramatiq-pg` quebra no Python 3.12 (usa `distutils`, removido do stdlib); o `entrypoint.sh` inicializa o schema com `dramatiq_pg.schema.generate_init_sql` via psycopg2.
 - huey conecta ao Postgres na importação (cria as tabelas da fila); o `entrypoint.sh` espera o banco ficar pronto antes de subir os containers.
 - O worker `db_worker` do django-tasks-db herda `DEBUG` para ativar autoreload; no Compose é passado `--no-reload` para estabilidade.
