@@ -12,7 +12,7 @@ workers isolados via Docker Compose.
 | `django-tasks-db` 0.12.0 | Postgres (`django_tasks_db`) | `manage.py db_worker` |
 | `chancy` 0.25.1 | Postgres (psycopg3) | `chancy worker start` |
 | `procrastinate` 3.9.0 | Postgres (psycopg) | `manage.py procrastinate worker` |
-| `taskito` 0.22.0 (Rust core) | Postgres (`taskito[postgres]`) | `taskito worker --app app_taskito.tasks:queue` |
+| `flexiq` 1.0.0 (Rust core, ex-taskito) | Postgres (`flexiq[postgres]`) | `manage.py flexiq_worker` |
 
 - Django 5.2 LTS · Python 3.12 · `uv` como gerenciador de pacotes.
 - **Sem Redis**: as 7 filas vivem no mesmo PostgreSQL.
@@ -27,7 +27,7 @@ enqueue, execução e observabilidade.
 ## Estrutura
 
 ```text
-config/                 # settings.py único com HUEY, DRAMATIQ_BROKER, Q_CLUSTER, TASKS, CHANCY e TASKITO
+config/                 # settings.py único com HUEY, DRAMATIQ_BROKER, Q_CLUSTER, TASKS, CHANCY e FLEXIQ
 core/                   # Report model, admin e management command run_task
 app_huey/               # tasks.py + admin action
 app_dramatiq/           # tasks.py + admin action
@@ -35,10 +35,10 @@ app_q2/                 # tasks.py + admin action
 app_tasks_db/           # tasks.py + admin action
 app_chancy/             # tasks.py + admin action
 app_procrastinate/      # tasks.py + admin action
-app_taskito/            # tasks.py + admin (taskito contrib.django)
+app_flexiq/             # tasks.py + admin (flexiq contrib.django)
 Dockerfile              # python:3.12-slim + uv
 entrypoint.sh           # wait db + migrate + createsuperuser + schema dramatiq-pg + chancy migrate
-docker-compose.yml      # db, web, worker_huey, worker_dramatiq, worker_q2, worker_tasks_db, worker_chancy, worker_procrastinate, worker_taskito
+docker-compose.yml      # db, web, worker_huey, worker_dramatiq, worker_q2, worker_tasks_db, worker_chancy, worker_procrastinate, worker_flexiq
 ```
 
 ## Como rodar
@@ -67,11 +67,11 @@ docker compose exec web .venv/bin/python manage.py run_task q2 5
 docker compose exec web .venv/bin/python manage.py run_task tasks_db 5
 docker compose exec web .venv/bin/python manage.py run_task chancy 5
 docker compose exec web .venv/bin/python manage.py run_task procrastinate 5
-docker compose exec web .venv/bin/python manage.py run_task taskito 5
+docker compose exec web .venv/bin/python manage.py run_task flexiq 5
 ```
 
 Pelo Admin: em **Reports**, selecione um ou mais registros e use as ações
-`Enqueue generate_report via Huey / Dramatiq / Django-Q2 / Django Tasks (DB) / Chancy / Procrastinate / Taskito`. A
+`Enqueue generate_report via Huey / Dramatiq / Django-Q2 / Django Tasks (DB) / Chancy / Procrastinate / FlexiQ`. A
 duração usada é o `duration_seconds` do registro.
 
 Cada worker roda em seu próprio container e consome apenas a própria fila.
@@ -86,7 +86,7 @@ Tudo está em `config/settings.py`:
 - **django-tasks-db**: `TASKS = {"default": {"BACKEND": "django_tasks_db.DatabaseBackend"}}` (backend oficial do framework `django-tasks`).
 - **chancy**: `chancy.contrib.django` (tabelas criadas via `chancy misc migrate`). Usa `config.chancy_app.chancy` para enqueue síncrono.
 - **procrastinate**: `procrastinate.contrib.django` com `PROCRASTINATE_DATABASE_ALIAS = "default"`. Worker via `manage.py procrastinate worker`.
-- **taskito**: `taskito.contrib.django` (integração oficial). Backend Postgres via `TASKITO_BACKEND`, `TASKITO_DB_URL` e `TASKITO_SCHEMA` nas Django settings. Worker via `taskito worker --app app_taskito.tasks:queue`. Tabelas criadas automaticamente no schema `taskito` na primeira conexão.
+- **flexiq** (ex-taskito, renomeado na 1.0.0): `flexiq.contrib.django` (integração oficial). Backend Postgres via `FLEXIQ_BACKEND`, `FLEXIQ_DB_URL` e `FLEXIQ_SCHEMA` nas Django settings. Worker via `manage.py flexiq_worker` (o CLI standalone `flexiq worker --app` não chama `django.setup()`). Tabelas criadas automaticamente no schema `flexiq` na primeira conexão. Tasks rodam em contexto async — o body usa `@sync_to_async` para chamar o ORM.
 
 ## Admin
 
@@ -100,7 +100,7 @@ Além de `core.Report`, cada lib expõe seus models nativos de monitoramento:
 | django-tasks-db | `DBTaskResult` |
 | chancy | `Job`, `Worker`, `Queue` (`chancy.contrib.django`) |
 | procrastinate | `ProcrastinateJob` (`procrastinate.contrib.django`) |
-| taskito | Dashboard, Jobs, Dead Letters (`taskito.contrib.django`) |
+| flexiq | Dashboard, Jobs, Dead Letters (`flexiq.contrib.django`) |
 
 ## Desenvolvimento local (fora do Docker)
 
@@ -115,7 +115,7 @@ uv run python manage.py qcluster
 uv run python manage.py db_worker --no-reload
 uv run chancy --app config.chancy_app worker start
 uv run python manage.py procrastinate worker
-uv run python manage.py taskito_worker
+uv run python manage.py flexiq_worker
 uv run python manage.py run_task huey 2
 ```
 
@@ -128,4 +128,4 @@ uv run python manage.py run_task huey 2
 - `django-huey-monitor` exige `bx_django_utils` no `INSTALLED_APPS` (warning `huey_monitor.E001` se ausente).
 - **chancy** usa psycopg3 nativo (já presente nas deps). Suas tabelas são criadas pelo próprio `chancy misc migrate`, não pelo Django. Models são `managed=False`.
 - **procrastinate** tem suporte Django oficial via `procrastinate[django]`. Worker roda como management command `manage.py procrastinate worker`.
-- **taskito** é um task queue com engine em Rust (Tokio + Diesel). Usa Postgres como backend compartilhado via `taskito[postgres]`. Tabelas ficam em um schema dedicado (`taskito`), criadas automaticamente na primeira conexão. O worker é um CLI standalone (`taskito worker`) e precisa de `DJANGO_SETTINGS_MODULE` e `PYTHONPATH` no ambiente.
+- **flexiq** é um task queue com engine em Rust (Tokio + Diesel), renomeado de taskito na 1.0.0. Usa Postgres como backend compartilhado via `flexiq[postgres]`. Tabelas ficam em um schema dedicado (`flexiq`), criadas automaticamente na primeira conexão. O worker roda como management command `manage.py flexiq_worker`.

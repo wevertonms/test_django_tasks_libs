@@ -1,7 +1,7 @@
 import time
 
 from asgiref.sync import sync_to_async
-from taskito.contrib.django.settings import get_queue
+from flexiq.contrib.django.settings import get_queue
 
 queue = get_queue()
 
@@ -14,7 +14,7 @@ def generate_report(n: int):
     from core.models import Report
 
     report = Report.objects.create(
-        source=Report.Source.TASKITO,
+        source=Report.Source.FLEXIQ,
         status=Report.Status.RUNNING,
         duration_seconds=n,
         started_at=timezone.now(),

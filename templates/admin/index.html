@@ -5,19 +5,19 @@
 {{ block.super }}
 
 <div class="module">
-  <h2>Taskito</h2>
+  <h2>FlexiQ</h2>
   <table>
-    <caption class="visually-hidden">Taskito</caption>
+    <caption class="visually-hidden">FlexiQ</caption>
     <tr>
-      <th scope="row"><a href="{% url 'admin:taskito_dashboard' %}">Dashboard</a></th>
+      <th scope="row"><a href="{% url 'admin:flexiq_dashboard' %}">Dashboard</a></th>
       <td>Queue stats: pending, running, completed, failed, dead, cancelled</td>
     </tr>
     <tr>
-      <th scope="row"><a href="{% url 'admin:taskito_jobs' %}">Jobs</a></th>
+      <th scope="row"><a href="{% url 'admin:flexiq_jobs' %}">Jobs</a></th>
       <td>Browse all jobs with status, retries, and creation time</td>
     </tr>
     <tr>
-      <th scope="row"><a href="{% url 'admin:taskito_dead_letters' %}">Dead Letters</a></th>
+      <th scope="row"><a href="{% url 'admin:flexiq_dead_letters' %}">Dead Letters</a></th>
       <td>Failed jobs that exhausted retries</td>
     </tr>
   </table>

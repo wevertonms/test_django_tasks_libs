@@ -9,7 +9,7 @@ class Report(models.Model):
         TASKS_DB = "tasks_db", "Django Tasks (DB)"
         CHANCY = "chancy", "Chancy"
         PROCRASTINATE = "procrastinate", "Procrastinate"
-        TASKITO = "taskito", "Taskito"
+        FLEXIQ = "flexiq", "FlexiQ"
 
     class Status(models.TextChoices):
         RUNNING = "running", "Running"

@@ -31,10 +31,10 @@ INSTALLED_APPS = [
     "bx_django_utils",
     "chancy.contrib.django",
     "procrastinate.contrib.django",
-    "taskito.contrib.django",
+    "flexiq.contrib.django",
     "app_chancy",
     "app_procrastinate",
-    "app_taskito",
+    "app_flexiq",
     "core",
     "app_huey",
     "app_dramatiq",
@@ -184,8 +184,8 @@ TASKS = {
 }
 
 # ---------------------------------------------------------------------------
-# taskito (Rust-powered, Postgres backend)
+# flexiq (Rust-powered, Postgres backend) — formerly taskito
 # ---------------------------------------------------------------------------
-TASKITO_BACKEND = "postgres"
-TASKITO_DB_URL = pg_dsn()
-TASKITO_SCHEMA = "taskito"
+FLEXIQ_BACKEND = "postgres"
+FLEXIQ_DB_URL = pg_dsn()
+FLEXIQ_SCHEMA = "flexiq"

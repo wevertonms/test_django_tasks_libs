@@ -87,9 +87,9 @@ services:
       db:
         condition: service_healthy
 
-  worker_taskito:
+  worker_flexiq:
     image: test-django-tasks-libs
-    command: python manage.py taskito_worker
+    command: python manage.py flexiq_worker
     environment: *app-env
     depends_on:
       db:
