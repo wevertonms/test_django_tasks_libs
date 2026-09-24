@@ -20,4 +20,5 @@ class ReportAdmin(admin.ModelAdmin):
     )
     list_filter = ("source", "status")
     search_fields = ("id",)
-    actions = [enqueue_huey, enqueue_dramatiq, enqueue_q2, enqueue_tasks_db]
+    # pyrefly: ignore [bad-override-mutable-attribute]
+    actions = (enqueue_huey, enqueue_dramatiq, enqueue_q2, enqueue_tasks_db)

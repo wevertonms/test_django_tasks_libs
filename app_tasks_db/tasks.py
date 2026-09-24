@@ -1,7 +1,7 @@
 import time
 
-from django_tasks import task
 from django.utils import timezone
+from django_tasks import task
 
 from core.models import Report
 

@@ -19,3 +19,14 @@ dependencies = [
     "psycopg[binary]>=3.3.4",
     "psycopg2-binary<3",
 ]
+
+[tool.pyrefly]
+project-includes = [
+    "**/*.py*",
+    "**/*.ipynb",
+]
+
+[dependency-groups]
+typing = [
+    "django-stubs>=6.1.1",
+]
