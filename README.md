@@ -4,15 +4,27 @@ App Django para comparar **7 bibliotecas de task queue** que usam
 **PostgreSQL como broker**, todas integradas ao Django Admin e rodando em
 workers isolados via Docker Compose.
 
-| Biblioteca | Stars | Última release | Último commit (main) | Broker | Worker |
-| --- | --- | --- | --- | --- | --- |
-| `huey` 3.4.0 (`huey.contrib.djhuey`) | ![Stars](https://img.shields.io/github/stars/coleifer/huey) | ![Release](https://img.shields.io/github/release-date/coleifer/huey) | ![Commit](https://img.shields.io/github/last-commit/coleifer/huey/master) | Postgres (`huey.PostgresHuey`) | `manage.py run_huey` |
-| `django-dramatiq` 0.15.0 | ![Stars](https://img.shields.io/github/stars/Bogdanp/django_dramatiq) | ![Release](https://img.shields.io/github/release-date/Bogdanp/django_dramatiq) | ![Commit](https://img.shields.io/github/last-commit/Bogdanp/django_dramatiq/master) | Postgres (`dramatiq-pg`) | `manage.py rundramatiq` |
-| `django-q2` 1.11.1 | ![Stars](https://img.shields.io/github/stars/django-q2/django-q2) | ![Release](https://img.shields.io/github/release-date/django-q2/django-q2) | ![Commit](https://img.shields.io/github/last-commit/django-q2/django-q2/master) | Postgres (ORM broker) | `manage.py qcluster` |
-| `django-tasks-db` 0.13.0 | ![Stars](https://img.shields.io/github/stars/RealOrangeOne/django-tasks-db) | ![Release](https://img.shields.io/github/release-date/RealOrangeOne/django-tasks-db) | ![Commit](https://img.shields.io/github/last-commit/RealOrangeOne/django-tasks-db/master) | Postgres (`django_tasks_db`) | `manage.py db_worker` |
-| `chancy` 0.25.1 | ![Stars](https://img.shields.io/github/stars/tktech/chancy) | ![Release](https://img.shields.io/github/release-date/tktech/chancy) | ![Commit](https://img.shields.io/github/last-commit/tktech/chancy/main) | Postgres (psycopg3) | `chancy worker start` |
-| `procrastinate` 3.10.0 | ![Stars](https://img.shields.io/github/stars/procrastinate-org/procrastinate) | ![Release](https://img.shields.io/github/release-date/procrastinate-org/procrastinate) | ![Commit](https://img.shields.io/github/last-commit/procrastinate-org/procrastinate/main) | Postgres (psycopg) | `manage.py procrastinate worker` |
-| `flexiq` 2.0.0 (Rust core, ex-taskito) | ![Stars](https://img.shields.io/github/stars/ByteVeda/flexiq) | ![Release](https://img.shields.io/github/release-date/ByteVeda/flexiq) | ![Commit](https://img.shields.io/github/last-commit/ByteVeda/flexiq/master) | Postgres (`flexiq[postgres]`) | `manage.py flexiq_worker` |
+| Biblioteca | Stars | Última release | Último commit (main) | Broker |
+| --- | --- | --- | --- | --- |
+| `huey` 3.4.0 (`huey.contrib.djhuey`) | ![Stars](https://img.shields.io/github/stars/coleifer/huey) | ![Release](https://img.shields.io/github/release-date/coleifer/huey) | ![Commit](https://img.shields.io/github/last-commit/coleifer/huey/master) | `huey.PostgresHuey` |
+| `django-dramatiq` 0.15.0 | ![Stars](https://img.shields.io/github/stars/Bogdanp/django_dramatiq) | ![Release](https://img.shields.io/github/release-date/Bogdanp/django_dramatiq) | ![Commit](https://img.shields.io/github/last-commit/Bogdanp/django_dramatiq/master) | `dramatiq-pg` |
+| `django-q2` 1.11.1 | ![Stars](https://img.shields.io/github/stars/django-q2/django-q2) | ![Release](https://img.shields.io/github/release-date/django-q2/django-q2) | ![Commit](https://img.shields.io/github/last-commit/django-q2/django-q2/master) | ORM broker |
+| `django-tasks-db` 0.13.0 | ![Stars](https://img.shields.io/github/stars/RealOrangeOne/django-tasks-db) | ![Release](https://img.shields.io/github/release-date/RealOrangeOne/django-tasks-db) | ![Commit](https://img.shields.io/github/last-commit/RealOrangeOne/django-tasks-db/master) | `django_tasks_db` |
+| `chancy` 0.25.1 | ![Stars](https://img.shields.io/github/stars/tktech/chancy) | ![Release](https://img.shields.io/github/release-date/tktech/chancy) | ![Commit](https://img.shields.io/github/last-commit/tktech/chancy/main) | psycopg3 |
+| `procrastinate` 3.10.0 | ![Stars](https://img.shields.io/github/stars/procrastinate-org/procrastinate) | ![Release](https://img.shields.io/github/release-date/procrastinate-org/procrastinate) | ![Commit](https://img.shields.io/github/last-commit/procrastinate-org/procrastinate/main) | psycopg |
+| `flexiq` 2.0.0 (Rust core, ex-taskito) | ![Stars](https://img.shields.io/github/stars/ByteVeda/flexiq) | ![Release](https://img.shields.io/github/release-date/ByteVeda/flexiq) | ![Commit](https://img.shields.io/github/last-commit/ByteVeda/flexiq/master) | `flexiq[postgres]` |
+
+## Workers
+
+| Biblioteca | Worker |
+| --- | --- |
+| `huey` | `manage.py run_huey` |
+| `django-dramatiq` | `manage.py rundramatiq` |
+| `django-q2` | `manage.py qcluster` |
+| `django-tasks-db` | `manage.py db_worker` |
+| `chancy` | `chancy worker start` |
+| `procrastinate` | `manage.py procrastinate worker` |
+| `flexiq` | `manage.py flexiq_worker` |
 
 - Django 5.2 LTS · Python 3.12 · `uv` como gerenciador de pacotes.
 - **Sem Redis**: as 7 filas vivem no mesmo PostgreSQL.
