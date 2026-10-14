@@ -1,7 +1,7 @@
 # test_django_tasks_libs
 
-App Django para comparar **7 bibliotecas de task queue** que usam
-**PostgreSQL como broker**, todas integradas ao Django Admin e rodando em
+App Django para comparar **8 bibliotecas de task queue** — 7 usam
+**PostgreSQL como broker** e 1 (`django-rq`) usa **Redis** — todas integradas ao Django Admin e rodando em
 workers isolados via Docker Compose.
 
 | Biblioteca | Stars | Última release | Último commit (main) | Broker |
@@ -13,6 +13,7 @@ workers isolados via Docker Compose.
 | `chancy` 0.25.1 | ![Stars](https://img.shields.io/github/stars/tktech/chancy) | ![Release](https://img.shields.io/github/release-date/tktech/chancy) | ![Commit](https://img.shields.io/github/last-commit/tktech/chancy/main) | psycopg3 |
 | `procrastinate` 3.10.0 | ![Stars](https://img.shields.io/github/stars/procrastinate-org/procrastinate) | ![Release](https://img.shields.io/github/release-date/procrastinate-org/procrastinate) | ![Commit](https://img.shields.io/github/last-commit/procrastinate-org/procrastinate/main) | psycopg |
 | `flexiq` 2.0.0 (Rust core, ex-taskito) | ![Stars](https://img.shields.io/github/stars/ByteVeda/flexiq) | ![Release](https://img.shields.io/github/release-date/ByteVeda/flexiq) | ![Commit](https://img.shields.io/github/last-commit/ByteVeda/flexiq/master) | `flexiq[postgres]` |
+| `django-rq` 4.2.0 (`rq` 2.12.0) | ![Stars](https://img.shields.io/github/stars/rq/django-rq) | ![Release](https://img.shields.io/github/release-date/rq/django-rq) | ![Commit](https://img.shields.io/github/last-commit/rq/django-rq/master) | **Redis** |
 
 ## Workers
 
@@ -25,9 +26,10 @@ workers isolados via Docker Compose.
 | `chancy` | `chancy worker start` |
 | `procrastinate` | `manage.py procrastinate worker` |
 | `flexiq` | `manage.py flexiq_worker` |
+| `django-rq` | `manage.py rqworker default` |
 
 - Django 5.2 LTS · Python 3.12 · `uv` como gerenciador de pacotes.
-- **Sem Redis**: as 7 filas vivem no mesmo PostgreSQL.
+- As 7 filas Postgres vivem no mesmo banco; o `django-rq` é a única que usa Redis (serviço `redis` no Compose).
 
 ## Task de demonstração
 
@@ -39,7 +41,7 @@ enqueue, execução e observabilidade.
 ## Estrutura
 
 ```text
-config/                 # settings.py único com HUEY, DRAMATIQ_BROKER, Q_CLUSTER, TASKS, CHANCY e FLEXIQ
+config/                 # settings.py único com HUEY, DRAMATIQ_BROKER, Q_CLUSTER, TASKS, CHANCY, FLEXIQ e RQ_QUEUES
 core/                   # Report model, admin e management command run_task
 app_huey/               # tasks.py + admin action
 app_dramatiq/           # tasks.py + admin action
@@ -48,9 +50,10 @@ app_tasks_db/           # tasks.py + admin action
 app_chancy/             # tasks.py + admin action
 app_procrastinate/      # tasks.py + admin action
 app_flexiq/             # tasks.py + admin (flexiq contrib.django)
+app_rq/                 # tasks.py + admin action (Redis)
 Dockerfile              # python:3.12-slim + uv
 entrypoint.sh           # wait db + migrate + createsuperuser + schema dramatiq-pg + chancy migrate
-docker-compose.yml      # db, web, worker_huey, worker_dramatiq, worker_q2, worker_tasks_db, worker_chancy, worker_procrastinate, worker_flexiq
+docker-compose.yml      # db, redis, web, worker_huey, worker_dramatiq, worker_q2, worker_tasks_db, worker_chancy, worker_procrastinate, worker_flexiq, worker_rq
 ```
 
 ## Como rodar
@@ -80,10 +83,11 @@ docker compose exec web .venv/bin/python manage.py run_task tasks_db 5
 docker compose exec web .venv/bin/python manage.py run_task chancy 5
 docker compose exec web .venv/bin/python manage.py run_task procrastinate 5
 docker compose exec web .venv/bin/python manage.py run_task flexiq 5
+docker compose exec web .venv/bin/python manage.py run_task rq 5
 ```
 
 Pelo Admin: em **Reports**, selecione um ou mais registros e use as ações
-`Enqueue generate_report via Huey / Dramatiq / Django-Q2 / Django Tasks (DB) / Chancy / Procrastinate / FlexiQ`. A
+`Enqueue generate_report via Huey / Dramatiq / Django-Q2 / Django Tasks (DB) / Chancy / Procrastinate / FlexiQ / RQ`. A
 duração usada é o `duration_seconds` do registro.
 
 Cada worker roda em seu próprio container e consome apenas a própria fila.
@@ -99,6 +103,7 @@ Tudo está em `config/settings.py`:
 - **chancy**: `chancy.contrib.django` (tabelas criadas via `chancy misc migrate`). Usa `chancy_instance.chancy` para enqueue síncrono.
 - **procrastinate**: `procrastinate.contrib.django` com `PROCRASTINATE_DATABASE_ALIAS = "default"`. Worker via `manage.py procrastinate worker`.
 - **flexiq** (ex-taskito, renomeado na 1.0.0): `flexiq.contrib.django` (integração oficial). Backend Postgres via `FLEXIQ_BACKEND`, `FLEXIQ_DB_URL` e `FLEXIQ_SCHEMA` nas Django settings. Worker via `manage.py flexiq_worker` (o CLI standalone `flexiq worker --app` não chama `django.setup()`). Tabelas criadas automaticamente no schema `flexiq` na primeira conexão. Tasks rodam em contexto async — o body usa `@sync_to_async` para chamar o ORM.
+- **django-rq**: `RQ_QUEUES` com a fila `default` apontando para `REDIS_URL` (padrão `redis://localhost:6379/0`). Task declarada com `@django_rq.job`, enfileirada com `.delay(n)`.
 
 ## Admin
 
@@ -113,6 +118,7 @@ Além de `core.Report`, cada lib expõe seus models nativos de monitoramento:
 | chancy | `Job`, `Worker`, `Queue` (`chancy.contrib.django`) |
 | procrastinate | `ProcrastinateJob` (`procrastinate.contrib.django`) |
 | flexiq | Dashboard, Jobs, Dead Letters (`flexiq.contrib.django`) |
+| django-rq | Dashboard em <http://localhost:8080/django-rq/> (filas, jobs, workers) |
 
 ## Desenvolvimento local (fora do Docker)
 
@@ -120,6 +126,7 @@ Além de `core.Report`, cada lib expõe seus models nativos de monitoramento:
 uv sync                                  # cria .venv com Python 3.12
 export POSTGRES_HOST=localhost
 export POSTGRES_PORT=5433                # porta do compose (ou a sua)
+export REDIS_URL=redis://localhost:6379/0  # Redis local para o django-rq
 uv run python manage.py migrate
 uv run python manage.py run_huey         # worker huey (um terminal por worker)
 uv run python manage.py rundramatiq -p 1 -t 2
@@ -128,6 +135,7 @@ uv run python manage.py db_worker --no-reload
 uv run chancy --app chancy_instance.chancy worker start
 uv run python manage.py procrastinate worker
 uv run python manage.py flexiq_worker
+uv run python manage.py rqworker default
 uv run python manage.py run_task huey 2
 ```
 

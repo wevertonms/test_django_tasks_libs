@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 
-LIBS = ("huey", "dramatiq", "q2", "tasks_db", "chancy", "procrastinate", "flexiq")
+LIBS = ("huey", "dramatiq", "q2", "tasks_db", "chancy", "procrastinate", "flexiq", "rq")
 
 
 class Command(BaseCommand):
@@ -41,6 +41,10 @@ class Command(BaseCommand):
 
             job = generate_report.delay(n)
             result = job.id
+        elif lib == "rq":
+            from app_rq.tasks import generate_report
+
+            result = generate_report.delay(n).id
         else:
             from app_tasks_db.tasks import generate_report
 

@@ -10,6 +10,7 @@ class Report(models.Model):
         CHANCY = "chancy", "Chancy"
         PROCRASTINATE = "procrastinate", "Procrastinate"
         FLEXIQ = "flexiq", "FlexiQ"
+        RQ = "rq", "RQ"
 
     class Status(models.TextChoices):
         RUNNING = "running", "Running"

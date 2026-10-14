@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 5
 requires-python = ">=3.12"
 
 [[package]]
@@ -198,6 +198,20 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/c8/6d/d5e103f31e64d61ad20da154200105d9f80a8e7b582afe80a377c70a1e3e/django_q2-1.11.1.tar.gz", hash = "sha256:640caf961f9098f26e00a22b743c4eb63da681a5390829b1ed951db677866e67", size = 100892, upload-time = "2026-08-26T02:47:43.592Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/aa/77/5448ec49605848eae6d6812994e71a312c2535821cf93853e1756e0b26a8/django_q2-1.11.1-py3-none-any.whl", hash = "sha256:b7e7cc030811babc1824de6c5888faec9e84ecd21572401bfdf48770ea67805f", size = 129780, upload-time = "2026-08-26T02:47:42.108Z" },
+]
+
+[[package]]
+name = "django-rq"
+version = "4.2.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "django" },
+    { name = "redis" },
+    { name = "rq" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/4e/de/333a4a89e6b74aa6c18eb189c3dd1fde17dbe7e8e1e9915033758a2dca72/django_rq-4.2.0.tar.gz", hash = "sha256:b1d6546f9f5446987dcc1146b5f9bd7c4343ad38551f984aefa8e331309b5364", size = 53480, upload-time = "2026-08-30T05:28:35.879Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/4e/77/09fcae297ff056132d10b5e258b386bf83744e63d3f4c3559cf6bad54368/django_rq-4.2.0-py3-none-any.whl", hash = "sha256:1a41151c2830184939b043e541eca0667b635f3deddcd3452ce52348cf5bbc38", size = 79592, upload-time = "2026-08-30T05:28:34.602Z" },
 ]
 
 [[package]]
@@ -612,6 +626,29 @@ wheels = [
 ]
 
 [[package]]
+name = "redis"
+version = "8.1.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/a8/99/604f0b666d4c616d891cf77ebb9db6bb21601344c051aebf1b72b9ff915f/redis-8.1.0.tar.gz", hash = "sha256:6e1a19beef9225c83efd689c7e6b7da2d5215b1f42cd13b7fc3714d0a09c7b25", size = 5254356, upload-time = "2026-07-30T08:51:00.269Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/66/9d/c5731f6e3608663d4d3656fd8d3aecee8b509c3082818f5a13eae925baea/redis-8.1.0-py3-none-any.whl", hash = "sha256:a4fe1aac3d3b3cc791d4b3d5931c5a956045dc951ee74d1c913ee3ac4d2ee9fb", size = 560618, upload-time = "2026-07-30T08:50:58.497Z" },
+]
+
+[[package]]
+name = "rq"
+version = "2.12.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "click" },
+    { name = "croniter" },
+    { name = "redis" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/a2/81/dacb94c8f67606b233cb7836dd67042daf9a61f7b585dcec65113f1e71f7/rq-2.12.0.tar.gz", hash = "sha256:78116d0c860f6285817b52d7d6d0b16a726372073ce8ea1d229732ce74ef9378", size = 760892, upload-time = "2026-08-30T12:05:25.048Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a4/c2/995863e88669133a058c2a6a912b62d18a64fa7baaf78eb66aaa4350b48d/rq-2.12.0-py3-none-any.whl", hash = "sha256:97e349a00e9f2a18962102b3dca156cb5ce315d3ef38145e24ba9cabd16a9361", size = 127957, upload-time = "2026-08-30T12:05:23.131Z" },
+]
+
+[[package]]
 name = "six"
 version = "1.17.0"
 source = { registry = "https://pypi.org/simple" }
@@ -648,6 +685,7 @@ dependencies = [
     { name = "django-dramatiq" },
     { name = "django-huey-monitor" },
     { name = "django-q2" },
+    { name = "django-rq" },
     { name = "django-tasks" },
     { name = "django-tasks-db" },
     { name = "dramatiq-pg" },
@@ -671,6 +709,7 @@ requires-dist = [
     { name = "django-dramatiq", specifier = ">=0.15.0" },
     { name = "django-huey-monitor", specifier = ">=0.10.1" },
     { name = "django-q2", specifier = ">=1.11.0" },
+    { name = "django-rq", specifier = ">=4.2.0" },
     { name = "django-tasks", specifier = ">=0.12.0" },
     { name = "django-tasks-db", specifier = ">=0.12.0" },
     { name = "dramatiq-pg", specifier = ">=0.12.0" },

@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     "chancy.contrib.django",
     "procrastinate.contrib.django",
     "flexiq.contrib.django",
+    "django_rq",
     "app_chancy",
     "app_procrastinate",
     "app_flexiq",
@@ -40,6 +41,7 @@ INSTALLED_APPS = [
     "app_dramatiq",
     "app_q2",
     "app_tasks_db",
+    "app_rq",
 ]
 
 MIDDLEWARE = [
@@ -189,3 +191,13 @@ TASKS = {
 FLEXIQ_BACKEND = "postgres"
 FLEXIQ_DB_URL = pg_dsn()
 FLEXIQ_SCHEMA = "flexiq"
+
+# ---------------------------------------------------------------------------
+# django-rq (Redis broker — the only lib here that does not use PostgreSQL)
+# ---------------------------------------------------------------------------
+RQ_QUEUES = {
+    "default": {
+        "URL": os.environ.get("REDIS_URL", "redis://localhost:6379/0"),
+        "DEFAULT_TIMEOUT": 360,
+    }
+}

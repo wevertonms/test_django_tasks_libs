@@ -18,6 +18,7 @@ dependencies = [
     "procrastinate[django]>=3.9.0",
     "psycopg[binary]>=3.3.4",
     "psycopg2-binary<3",
+    "django-rq>=4.2.0",
 ]
 
 [tool.pyrefly]
